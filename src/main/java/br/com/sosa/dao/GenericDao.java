@@ -51,7 +51,7 @@ public class GenericDao<E> {
         return list;
     }
 
-    public EntityManager getEntityManager(){
+    public EntityManager getEntityManager() {
         return entityManager;
     }
 }

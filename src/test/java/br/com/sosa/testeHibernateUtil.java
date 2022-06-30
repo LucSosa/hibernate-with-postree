@@ -1,9 +1,8 @@
 package br.com.sosa;
 
-import static org.junit.Assert.assertTrue;
-
 import br.com.sosa.dao.GenericDao;
 import br.com.sosa.model.PersonUser;
+import br.com.sosa.model.PhoneUser;
 import org.junit.Test;
 
 import java.util.List;
@@ -74,18 +73,105 @@ public class testeHibernateUtil {
             System.out.println(peopleList);
             System.out.println("-----------");
         }
-
     }
 
     @Test
-    public void testQueryList(){
+    public void testQueryList() {
         GenericDao<PersonUser> dao = new GenericDao<PersonUser>();
         List<PersonUser> list = dao.getEntityManager().createQuery("FROM PersonUser WHERE firstName = 'Lucas'").getResultList();
 
         for (PersonUser personUser : list) {
             System.out.println(personUser);
         }
+    }
 
+    @Test
+    public void testQueryListMaxResult() {
+        GenericDao<PersonUser> dao = new GenericDao<PersonUser>();
+        List<PersonUser> list = dao.getEntityManager()
+                .createQuery("FROM PersonUser ORDER BY firstName")
+                .setMaxResults(4)
+                .getResultList();
 
+        for (PersonUser personUser : list) {
+            System.out.println(personUser);
+        }
+    }
+
+    @Test
+    public void testQueryListParameter() {
+        GenericDao<PersonUser> dao = new GenericDao<PersonUser>();
+        List<PersonUser> list = dao.getEntityManager()
+                .createQuery("FROM PersonUser WHERE firstName = :name")
+                .setParameter("name", "Lucas")
+                .getResultList();
+
+        for (PersonUser personUser : list) {
+            System.out.println(personUser);
+        }
+    }
+
+    @Test
+    public void testSumAge(){
+        GenericDao<PersonUser> dao = new GenericDao<PersonUser>();
+
+        Long sumAge = (Long) dao.getEntityManager()
+                .createQuery("SELECT SUM(u.age) FROM PersonUser u")
+                .getSingleResult();
+
+        System.out.println("Soma de todas as idades é " + sumAge);
+    }
+
+    @Test
+    public void testNamedQuery(){
+        GenericDao<PersonUser> dao = new GenericDao<PersonUser>();
+        List<PersonUser> list = dao.getEntityManager().createNamedQuery("PersonUser.queryAll").getResultList();
+
+        for (PersonUser personUser : list) {
+            System.out.println(personUser);
+            System.out.println("------------");
+        }
+    }
+
+    @Test
+    public void testNamedQueryByName(){
+        GenericDao<PersonUser> dao = new GenericDao<PersonUser>();
+        List<PersonUser> list = dao.getEntityManager().createNamedQuery("PersonUser.FindByName")
+                .setParameter("name", "Lucas").getResultList();
+
+        for (PersonUser personUser : list) {
+            System.out.println(personUser);
+            System.out.println("------------");
+        }
+    }
+
+    @Test
+    public void testInsertPhone(){
+        GenericDao dao = new GenericDao();
+        PersonUser user = new PersonUser();
+
+        user.setId(4L);
+
+        PhoneUser phone = new PhoneUser();
+        phone.setTipo("Celular");
+        phone.setNumero("665544332");
+        phone.setPersonUser(user);
+
+        dao.save(phone);
+    }
+
+    @Test
+    public void testFindPhones(){
+        GenericDao dao = new GenericDao();
+        PersonUser user = new PersonUser();
+
+        user.setId(4L);
+
+        for (PhoneUser fone : user.getPhoneUsers()){
+            System.out.println(fone.getNumero());
+            System.out.println(fone.getTipo());
+            System.out.println(fone.getPersonUser().getFirstName());
+            System.out.println("-----------------------");
+        }
     }
 }

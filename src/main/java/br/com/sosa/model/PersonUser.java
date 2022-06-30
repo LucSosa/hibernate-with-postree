@@ -1,11 +1,15 @@
 package br.com.sosa.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "PersonUser.queryAll",
+                    query = "SELECT u FROM PersonUser u"),
+        @NamedQuery(name = "PersonUser.FindByName",
+                    query = "SELECT u FROM PersonUser u WHERE u.firstName = :name")
+})
 public class PersonUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,9 +20,18 @@ public class PersonUser {
     private String login;
     private String password;
     private int age;
-
+    @OneToMany(mappedBy = "personUser", fetch = FetchType.EAGER)
+    private List<PhoneUser> phoneUsers;
     public int getAge() {
         return age;
+    }
+
+    public List<PhoneUser> getPhoneUsers() {
+        return phoneUsers;
+    }
+
+    public void setPhoneUsers(List<PhoneUser> phoneUsers) {
+        this.phoneUsers = phoneUsers;
     }
 
     public void setAge(int age) {
